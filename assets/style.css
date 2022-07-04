@@ -1,0 +1,91 @@
+main {
+  padding-bottom: 2rem;
+}
+
+/* Hourly row */
+.row {
+  background-color: rgb(245,245,245);
+  height: 4em;
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+/* Added borders to all `row` children as opposed to the row itself, in order to maintain styling when the page resizes for smaller screens */
+.row > * {
+  border-top: 1px solid rgb(150,150,150);
+}
+/* Last row gets a bottom border to close the 'table' */
+.row:last-child {
+  border-bottom: 1px solid rgb(150,150,150);
+}
+/* row colors for `present` and `future` rows, `past` uses default row color */
+.row.present {
+  background-color: rgb(255, 222, 123);
+}
+.row.future {
+  background-color: rgb(238, 221, 255);
+}
+
+.time-col {
+  text-align: right;
+  
+}
+.time-col, .event-data-col {
+  padding-top: 5px;
+}
+
+/* Absolute positioning so that `.display` and `textarea` completely overlap */
+.event-data-col .display {
+  position: absolute;
+  z-index: 0;
+}
+.event-data-col textarea {
+  display: none;
+  background-color: rgb(245,245,245);
+  padding: 5px;
+  z-index: 1;
+}
+
+/* Maintain row color when textarea gets focus */
+.event-data-col textarea:focus {
+  background-color: rgb(245,245,245);
+}
+.present .event-data-col textarea:focus {
+  background-color: rgb(255, 222, 123);
+}
+.future .event-data-col textarea:focus {
+  background-color: rgb(238, 221, 255);
+}
+
+
+
+.save-col {
+  align-self: stretch;
+  border-radius: 0 0.25rem 0.25rem 0;
+  padding: 0;
+}
+.save-col img {
+  width:100%;
+  max-width: 30px;
+}
+.save-col .btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  padding: 4px;
+  height: 100%;
+  width: 100%;
+}
+
+/* MEDIA QUERIES */
+@media screen and (max-width: 575px) {
+  .time-col {
+    border-top: none;
+    text-align: left;
+    background-color: white;
+    width: calc(100% - 0.25rem);  
+  }
+  .save-col {
+    border-top-right-radius: 0;
+  }
+  .save-col .btn {
+    border-top-right-radius: 0;
+  }
+}
