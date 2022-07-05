@@ -14,9 +14,11 @@ let currentHour = moment().hour()
  * Updates the rows as well when the hour changes
  */
 function setTime() {
-  $('#today').text(moment().format('LLL'))
+
+  const now = moment().startOf('minute')
+  $('#today').text(now.format('LLL'))
   /** Gets the current hour */
-  let hour = moment().hour()
+  let hour = now.hour()
   /** Display a message if the current time is outside of the 8am-7pm */
   if (hour > 18) $('#today').append(`<p class='text-danger'>Take a break! It's a little late...</p>`)
   else if (hour < 8) $('#today').append(`<p class='text-danger'>Early bird gets the worm! Good for you!</p>`)
@@ -30,8 +32,13 @@ function setTime() {
 }
 /** Sets the initial clock display */
 setTime()
-/** Updates the clock display every minute */
-setInterval(setTime, 1000 * 60);
+/** Delays setInterval for time updates to the beginning of the next minute  */
+setTimeout(() =>
+  /** Updates the clock display every minute */
+  setInterval(setTime, 1000 * 60),
+  /** Evaluates to number of milliseconds between now and the beginning of the next minute */
+  moment().diff(moment().add(1, 'minute').startOf('minute'))
+)
 
 /**
  * Updates all the text in the row
@@ -96,23 +103,38 @@ $('.event-data-col').find('textarea').on('blur', function () {
   $(this).hide()
   $(this).prev('.display').show().text(text)
   saveRow(row)
-}).on('keyup', function (ev) {
+}).on('keydown', function (ev) {
   $(this).closest('.row').find('.save-col').find('button').removeClass('disabled')
   /** 
-   * `Enter + option` moves to next textarea
-   * `Enter + option + shift` moves to previous textarea
+   * `Enter` moves to next textarea
+   * `shift + Enter` add new line `&#10;`
+   * `option + shift + Enter` moves to previous textarea
    *  */
   let { key, altKey, shiftKey } = ev
-  console.log(ev)
-  if (key === 'Enter' && altKey) {
+  if (key === 'Enter') {
     ev.preventDefault()
+
+    const nextInput = !shiftKey && !altKey
+    const prevInput = altKey
+    const newLine = shiftKey
+    if (newLine) {
+      $(this).val($(this).val() + '\n')
+      return
+    }
+    if (!nextInput && !prevInput) return
+
     /** Triggers blur event which saves row data */
     $(this).blur()
     /** Determines which direction to move focus */
-    const row = shiftKey
-      ? $(this).closest('.row').prev('.row')
-      : $(this).closest('.row').next('.row')
-    row.length ? row.find('.display').click() : $('.row').first().find('.display').click()
+    const row = nextInput
+      ? $(this).closest('.row').next('.row')
+      : $(this).closest('.row').prev('.row')
+    /** If next row doesn't exist wrap around to first/last row */
+    row.length
+      ? row.find('.display').click()
+      : nextInput
+        ? $('.row').first().find('.display').click()
+        : $('.row').last().find('.display').click()
   }
 })
 /**
@@ -121,7 +143,7 @@ $('.event-data-col').find('textarea').on('blur', function () {
  */
 $('.event-data-col').on('click', function () {
   $(this).find('.display').hide()
-  $(this).find('textarea').show().focus()
+  $(this).find('textarea').show().focus().select()
 })
 /**
  * Event listeners for save button
@@ -130,3 +152,30 @@ $('.save-col').find('button').on('click', function () {
   if ($(this).hasClass('disabled')) return
   saveRow($(this).closest('.row'))
 })
+
+/**
+ * Hides navigation help if user already dismissed it
+ */
+if (!localStorage.getItem('hasDismissedNavInfo')) {
+  const alert = $(`<div class="alert alert-info alert-dismissible fade show nav-info" role="alert">
+        <h4>How to Use</h4>
+        <ul>
+          <li>Click a row to edit</li>
+          <li><code>Enter</code> moves forward</li>
+          <li><code>shift + Enter</code> adds a new line</li>
+          <li><code>option/alt + Enter</code> moves backward</li>
+        </ul>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>`).prependTo($('main'))
+  alert.find('button').on('click', () => {
+    localStorage.setItem('hasDismissedNavInfo', 'true')
+  })
+
+}
