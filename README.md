@@ -20,12 +20,15 @@ This simple task scheduler allows you to save your daily routine and tracks the 
 - Displays the row of future hours with light purple background
 - When the hour changes, the colors update as well
 
-
+## Easy UI 
+### `How to Use`
+A banner is displayed that clearly describes how to use the page. The banner is dismissable and does not appear again once dismissed, even on reload.
+![Task scheduler demo](./assets/images/demo.gif)
 
 ### Built Using...
 Bootstrap, jQuery and Moment.js
 
-# Screenshots
+# Responsive Design
 ### Large Screen
 ![Task scheduler screenshot](./assets/images/large-screen.png)
 ### Medium Screen
